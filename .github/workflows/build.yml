@@ -1,0 +1,33 @@
+name: Build and Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        sanitizer: ["-DENABLE_ASAN=ON", "-DENABLE_UBSAN=ON", "-DENABLE_TSAN=ON", '']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install sanitizers
+        run: sudo apt-get update && sudo apt-get install -y clang cmake make cppcheck clang-tidy
+
+      - name: Configure CMake with sanitizer
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang DCMAKE_CXX_COMPILER=clang ${{ matrix.sanitizer }}
+
+      - name: Build with sanitizer
+        run: cmake --build build
+
+      - name: Run tests
+        run: ./build/tests
+
+      - name: Run cppcheck
+        run: cppcheck --enable=all --suppress=missingIncludeSystem --quiet src
+
+      - name: Run clang-tidy
+        run: clang-tidy -p build src/*.c src/*.h --
