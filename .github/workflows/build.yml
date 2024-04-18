@@ -18,7 +18,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang cmake make cppcheck clang-tidy
 
       - name: Configure CMake with sanitizer
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang DCMAKE_CXX_COMPILER=clang ${{ matrix.sanitizer }}
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ${{ matrix.sanitizer }}
 
       - name: Build with sanitizer
         run: cmake --build build
